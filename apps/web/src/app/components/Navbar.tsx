@@ -71,6 +71,26 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           </button>
 
           <Link
+            href="/npcs"
+            className="rounded-lg p-2 text-text-muted hover:bg-surface-light hover:text-text"
+            aria-label="AI Companions"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+            </svg>
+          </Link>
+
+          <Link
+            href="/marketplace"
+            className="rounded-lg p-2 text-text-muted hover:bg-surface-light hover:text-text"
+            aria-label="Marketplace"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </Link>
+
+          <Link
             href="/notifications"
             className="relative rounded-lg p-2 text-text-muted hover:bg-surface-light hover:text-text"
             aria-label="Notifications"
@@ -83,12 +103,21 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
 
           {user ? (
             <div className="flex items-center gap-2">
+              {/* Coin balance */}
+              <Link
+                href="/wallet"
+                className="hidden items-center gap-1 rounded-lg border border-border bg-surface-light px-2.5 py-1.5 text-xs text-text-muted transition hover:border-primary/30 sm:flex"
+              >
+                <span className="text-primary font-semibold">28.4K</span>
+                <span>🪙</span>
+              </Link>
+              {/* Level badge */}
               <Link
                 href="/profile"
                 className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-surface-light"
               >
-                <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
-                  {user.email?.charAt(0).toUpperCase() ?? "U"}
+                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-[10px] font-bold text-white shadow-glow">
+                  47
                 </div>
                 <span className="hidden text-sm text-text-muted sm:block">
                   {user.email?.split("@")[0]}
