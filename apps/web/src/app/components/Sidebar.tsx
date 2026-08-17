@@ -16,16 +16,17 @@ interface SidebarProps {
 }
 
 const NAV_LINKS = [
-  { href: "/", label: "Home", icon: HomeIcon },
-  { href: "/realms", label: "Explore Realms", icon: GlobeIcon },
-  { href: "/hub", label: "Dreamcadian Hub", icon: SparklesIcon },
-  { href: "/feed", label: "Community Feed", icon: FeedIcon },
-  { href: "/marketplace", label: "Marketplace", icon: ShopIcon },
-  { href: "/npcs", label: "AI Companions", icon: BrainIcon },
-  { href: "/messages", label: "Messages", icon: MessageIcon },
-  { href: "/notifications", label: "Notifications", icon: BellIcon },
-  { href: "/profile", label: "My Profile", icon: UserIcon },
-  { href: "/settings", label: "Settings", icon: CogIcon },
+  { href: "/", label: "Home", icon: HomeIcon, badge: null },
+  { href: "/realms", label: "Explore Realms", icon: GlobeIcon, badge: null },
+  { href: "/hub", label: "Dreamcadian Hub", icon: SparklesIcon, badge: null },
+  { href: "/feed", label: "Community Feed", icon: FeedIcon, badge: null },
+  { href: "/marketplace", label: "Marketplace", icon: ShopIcon, badge: null },
+  { href: "/npcs", label: "AI Companions", icon: BrainIcon, badge: null },
+  /** Presence dot simulates having active conversations */
+  { href: "/messages", label: "Messages", icon: MessageIcon, badge: "presence" as const },
+  { href: "/notifications", label: "Notifications", icon: BellIcon, badge: null },
+  { href: "/profile", label: "My Profile", icon: UserIcon, badge: null },
+  { href: "/settings", label: "Settings", icon: CogIcon, badge: null },
 ];
 
 function HomeIcon({ className }: { className?: string }) {
@@ -161,7 +162,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className={linkClasses(link.href)}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
-                  <span>{link.label}</span>
+                  <span className="flex-1">{link.label}</span>
+                  {/* Presence dot for Messages — indicates active conversations */}
+                  {link.badge === "presence" && (
+                    <span
+                      className="ml-auto h-2 w-2 rounded-full bg-success ring-2 ring-success/30"
+                      aria-label="Active conversations"
+                    />
+                  )}
                 </Link>
               );
             })}

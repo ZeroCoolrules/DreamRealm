@@ -476,6 +476,12 @@ export type Notification = z.infer<typeof notificationSchema>;
 export const realmStatusSchema = z.enum(["active", "beta", "archived", "private"]);
 export type RealmStatus = z.infer<typeof realmStatusSchema>;
 
+export const realmVisibilitySchema = z.enum(["public", "private", "invite_only", "monetized"]);
+export type RealmVisibility = z.infer<typeof realmVisibilitySchema>;
+
+export const realmAgeRatingSchema = z.enum(["G", "PG", "PG-13", "R", "NC-17"]);
+export type RealmAgeRating = z.infer<typeof realmAgeRatingSchema>;
+
 export const realmSchema = z.object({
   id: uuidSchema,
   slug: z.string().min(1).max(100),
@@ -487,6 +493,11 @@ export const realmSchema = z.object({
   member_count: z.number().int().min(0).default(0),
   is_featured: z.boolean().default(false),
   is_joined: z.boolean().default(false),
+  // Phase 4.4: Realm Creation Engine — optional extended fields
+  visibility: realmVisibilitySchema.optional(),
+  age_rating: realmAgeRatingSchema.optional(),
+  owner_id: uuidSchema.nullable().optional(),
+  analytics_enabled: z.boolean().optional(),
   created_at: timestampSchema,
   updated_at: timestampSchema,
 });
@@ -943,3 +954,198 @@ export const userNPCRelationshipSchema = z.object({
 });
 
 export type UserNPCRelationship = z.infer<typeof userNPCRelationshipSchema>;
+
+// ---------------------------------------------------------------------------
+// Phase 4.5: Social & Communication — Message Reactions
+// ---------------------------------------------------------------------------
+
+export const messageReactionSchema = z.object({
+  id: uuidSchema,
+  message_id: uuidSchema,
+  user_id: uuidSchema,
+  reaction_type: z.string().max(50).default("emoji"),
+  emoji: z.string().max(10),
+  created_at: timestampSchema,
+});
+
+export type MessageReaction = z.infer<typeof messageReactionSchema>;
+
+// ---------------------------------------------------------------------------
+// Phase 4.5: Social & Communication — Message Replies (Threading)
+// ---------------------------------------------------------------------------
+
+export const messageReplySchema = z.object({
+  id: uuidSchema,
+  message_id: uuidSchema,
+  reply_to_message_id: uuidSchema,
+  user_id: uuidSchema,
+  content: z.string().max(10000),
+  created_at: timestampSchema,
+  updated_at: timestampSchema,
+});
+
+export type MessageReply = z.infer<typeof messageReplySchema>;
+
+// ---------------------------------------------------------------------------
+// Phase 4.5: Social & Communication — Group Chat Members
+// ---------------------------------------------------------------------------
+
+export const groupChatMemberRoleSchema = z.enum(["owner", "admin", "member"]);
+export type GroupChatMemberRole = z.infer<typeof groupChatMemberRoleSchema>;
+
+export const groupChatMemberSchema = z.object({
+  id: uuidSchema,
+  conversation_id: uuidSchema,
+  user_id: uuidSchema,
+  role: groupChatMemberRoleSchema.default("member"),
+  joined_at: timestampSchema,
+  updated_at: timestampSchema,
+});
+
+export type GroupChatMember = z.infer<typeof groupChatMemberSchema>;
+
+// ---------------------------------------------------------------------------
+// Phase 4.5: Social & Communication — Announcements
+// ---------------------------------------------------------------------------
+
+export const announcementPrioritySchema = z.enum(["low", "normal", "high", "urgent"]);
+export type AnnouncementPriority = z.infer<typeof announcementPrioritySchema>;
+
+export const announcementSchema = z.object({
+  id: uuidSchema,
+  realm_id: uuidSchema.nullable(),
+  title: z.string().min(1).max(200),
+  body: z.string().min(1),
+  priority: announcementPrioritySchema.default("normal"),
+  is_pinned: z.boolean().default(false),
+  starts_at: timestampSchema.nullable(),
+  expires_at: timestampSchema.nullable(),
+  created_by: uuidSchema,
+  created_at: timestampSchema,
+  updated_at: timestampSchema,
+});
+
+export type Announcement = z.infer<typeof announcementSchema>;
+
+// ---------------------------------------------------------------------------
+// Phase 4.5: Social & Communication — Stickers
+// ---------------------------------------------------------------------------
+
+export const stickerSchema = z.object({
+  id: uuidSchema,
+  name: z.string().min(1).max(100),
+  url: z.string().url(),
+  category: z.string().max(50).default("general"),
+  price_dream: z.number().int().min(0).default(0),
+  is_premium: z.boolean().default(false),
+  created_at: timestampSchema,
+});
+
+export type Sticker = z.infer<typeof stickerSchema>;
+
+// ---------------------------------------------------------------------------
+// Phase 4.4: Realm Creation Engine
+// ---------------------------------------------------------------------------
+
+// --- Realm Assets ---
+
+export const realmAssetTypeSchema = z.enum([
+  "image",
+  "video",
+  "audio",
+  "model",
+  "script",
+  "spawn_point",
+  "voice_zone",
+]);
+export type RealmAssetType = z.infer<typeof realmAssetTypeSchema>;
+
+export const realmAssetSchema = z.object({
+  id: uuidSchema,
+  realm_id: uuidSchema,
+  asset_type: realmAssetTypeSchema,
+  url: z.string(),
+  thumbnail_url: z.string().nullable(),
+  metadata: z.record(z.unknown()).nullable(),
+  sort_order: z.number().int().min(0).default(0),
+  created_by: uuidSchema,
+  created_at: timestampSchema,
+  updated_at: timestampSchema,
+});
+export type RealmAsset = z.infer<typeof realmAssetSchema>;
+
+// --- Realm Permissions ---
+
+export const realmPermissionRoleSchema = z.enum([
+  "owner",
+  "admin",
+  "moderator",
+  "member",
+  "banned",
+]);
+export type RealmPermissionRole = z.infer<typeof realmPermissionRoleSchema>;
+
+export const realmPermissionSchema = z.object({
+  id: uuidSchema,
+  realm_id: uuidSchema,
+  user_id: uuidSchema,
+  role: realmPermissionRoleSchema.default("member"),
+  permissions: z.record(z.unknown()).nullable(),
+  joined_at: timestampSchema,
+  updated_at: timestampSchema,
+});
+export type RealmPermission = z.infer<typeof realmPermissionSchema>;
+
+// --- Realm Moderators ---
+
+export const realmModeratorSchema = z.object({
+  id: uuidSchema,
+  realm_id: uuidSchema,
+  user_id: uuidSchema,
+  moderator_notes: z.string().nullable(),
+  is_active: z.boolean().default(true),
+  assigned_by: uuidSchema,
+  created_at: timestampSchema,
+  updated_at: timestampSchema,
+});
+export type RealmModerator = z.infer<typeof realmModeratorSchema>;
+
+// --- Realm Events ---
+
+export const realmEventTypeSchema = z.enum([
+  "spawn_set",
+  "zone_added",
+  "object_placed",
+  "script_triggered",
+  "member_joined",
+  "member_left",
+  "announcement",
+  "mini_game_started",
+]);
+export type RealmEventType = z.infer<typeof realmEventTypeSchema>;
+
+export const realmEventSchema = z.object({
+  id: uuidSchema,
+  realm_id: uuidSchema,
+  event_type: realmEventTypeSchema,
+  payload: z.record(z.unknown()),
+  triggered_by: uuidSchema.nullable(),
+  created_at: timestampSchema,
+});
+export type RealmEvent = z.infer<typeof realmEventSchema>;
+
+// --- Realm Analytics ---
+
+export const realmAnalyticSchema = z.object({
+  id: uuidSchema,
+  realm_id: uuidSchema,
+  date: z.string().date(),
+  member_count: z.number().int().min(0).default(0),
+  message_count: z.number().int().min(0).default(0),
+  activity_score: z.number().int().min(0).default(0),
+  revenue_dream: z.number().int().min(0).default(0),
+  top_events: z.record(z.unknown()).nullable(),
+  created_at: timestampSchema,
+  updated_at: timestampSchema,
+});
+export type RealmAnalytic = z.infer<typeof realmAnalyticSchema>;
